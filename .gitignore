@@ -1,0 +1,15 @@
+workflows/originais/
+
+.env
+.env.*
+*.log
+node_modules/
+
+# Arquivos locais de export/análise que não devem ir para o repositório público.
+*.original.json
+*.privado.json
+*.private.json
+output*.json
+*execucao-teste*.json
+*execução-teste*.json
+*COMERCIAL*Orçamentos*.json
