@@ -36,21 +36,6 @@ O workflow combina regras determinísticas e classificação semântica:
 
 A captura mostra somente a topologia do workflow no canvas do n8n. Painéis de configuração, payloads, credenciais, tokens e dados reais foram mantidos fora da documentação pública.
 
-## Fluxo Macro
-
-```mermaid
-flowchart LR
-  A["Gmail Trigger"] --> B["Get Message Content"]
-  B --> C["Pré-Filtro"]
-  C --> D{"Candidato a orçamento?"}
-  D -->|sim| E["Classificação e extração com LLM"]
-  E --> F{"Novo orçamento?"}
-  F -->|sim| G["Registro no Supabase"]
-  G --> H["Aplicar label no Gmail"]
-  H --> I["Estruturar mensagem"]
-  I --> J["Alertar canal operacional"]
-```
-
 ## Stack
 
 - n8n
@@ -108,6 +93,6 @@ Apenas a versão sanitizada do workflow deve ser publicada. Exports originais, o
 
 O fluxo documentado já representa uma automação ativa em produção. O roadmap em [docs/06-roadmap-evolucao.md](docs/06-roadmap-evolucao.md) registra melhorias planejadas para ampliar robustez, observabilidade e capacidade de processamento, sem tratar essas melhorias como requisitos para funcionamento atual.
 
-## Status
+## Estado do Projeto
 
-Pronto para upload manual no GitHub como case de portfólio técnico.
+Automação real em produção, documentada e sanitizada para fins de portfólio técnico.
