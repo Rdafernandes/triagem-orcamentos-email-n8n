@@ -1,0 +1,9 @@
+{
+  "id": "<GMAIL_MESSAGE_ID>",
+  "threadId": "<GMAIL_THREAD_ID>",
+  "labelIds": [
+    "INBOX",
+    "UNREAD",
+    "<GMAIL_LABEL_ID_PROCESSADO>"
+  ]
+}

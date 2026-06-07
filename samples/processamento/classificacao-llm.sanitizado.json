@@ -1,0 +1,9 @@
+{
+  "tipo": "NOVO_ORCAMENTO",
+  "e_novo_orcamento": true,
+  "nome_contato": "Contato Exemplo",
+  "empresa": "Empresa Exemplo",
+  "data_recebido": "2026-06-05",
+  "hora_recebido": "14:32",
+  "resumo": "*ITENS SOLICITADOS*\n• 20 placas em PVC 2mm - tamanho 30x40 cm - impressao 4/0\n• 2 banners em lona - tamanho 80x120 cm - acabamento em bastao\n\n*PRAZOS*\n• Entrega solicitada ate 12/06\n\n*ENTREGA / ENDERECOS*\n• Sao Paulo/SP"
+}

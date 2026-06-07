@@ -1,0 +1,441 @@
+﻿{
+    "name":  "[PUBLICO] Orçamentos recebidos por e-mail comercial",
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "pollTimes":  {
+                                                           "item":  [
+                                                                        {
+                                                                            "mode":  "everyMinute"
+                                                                        }
+                                                                    ]
+                                                       },
+                                         "simple":  false,
+                                         "filters":  {
+                                                         "includeSpamTrash":  false,
+                                                         "q":  "in:inbox -label:\u003cLABEL_PROCESSADO\u003e -from:\u003cEMAIL_INTERNO_EXCLUIDO\u003e",
+                                                         "readStatus":  "unread"
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "Gmail Trigger",
+                      "type":  "n8n-nodes-base.gmailTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -560,
+                                       -400
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "get",
+                                         "messageId":  "={{ $json.id }}",
+                                         "simple":  false,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "name":  "Get Message Content",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       -288,
+                                       -400
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "addLabels",
+                                         "messageId":  "={{ $(\u0027Get Message Content\u0027).item.json.id }}",
+                                         "labelIds":  "={{ [\u0027\u003cGMAIL_LABEL_ID_PROCESSADO\u003e\u0027] }}"
+                                     },
+                      "name":  "Adicionar label orc_processado",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       1440,
+                                       -720
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://gate.whapi.cloud/messages/text",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "=Bearer \u003cWHAPI_API_TOKEN\u003e"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "bodyParameters":  {
+                                                                "parameters":  [
+                                                                                   {
+                                                                                       "name":  "to",
+                                                                                       "value":  "\u003cWHATSAPP_GROUP_ID\u003e"
+                                                                                   },
+                                                                                   {
+                                                                                       "name":  "body",
+                                                                                       "value":  "={{ $json.mensagem_whatsapp }}"
+                                                                                   }
+                                                                               ]
+                                                            },
+                                         "options":  {
+                                                         "timeout":  120000
+                                                     }
+                                     },
+                      "name":  "Whapi - Alertar Grupo",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.2,
+                      "position":  [
+                                       1840,
+                                       -720
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "tableId":  "\u003cSUPABASE_TABLE_ORCAMENTOS_EMAIL\u003e",
+                                         "fieldsUi":  {
+                                                          "fieldValues":  [
+                                                                              {
+                                                                                  "fieldId":  "timestamp_processado",
+                                                                                  "fieldValue":  "={{ $now }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "message_id",
+                                                                                  "fieldValue":  "={{ $(\u0027Get Message Content\u0027).item.json.id }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "thread_id",
+                                                                                  "fieldValue":  "={{ $(\u0027Get Message Content\u0027).item.json.threadId }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "from_raw",
+                                                                                  "fieldValue":  "={{ $(\u0027Get Message Content\u0027).item.json.from.text }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "nome_contato",
+                                                                                  "fieldValue":  "={{ $(\u0027Get Message Content\u0027).item.json.from.value[0].name }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "empresa",
+                                                                                  "fieldValue":  "={{ $json.empresa }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "assunto",
+                                                                                  "fieldValue":  "={{ $(\u0027Get Message Content\u0027).item.json.subject }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "resumo",
+                                                                                  "fieldValue":  "={{$json.resumo}}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "data_recebido",
+                                                                                  "fieldValue":  "={{DateTime.fromISO($json.data_recebido).toFormat(\u0027dd/MM/yyyy\u0027)}}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "hora_recebido",
+                                                                                  "fieldValue":  "={{ $json.hora_recebido }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "tipo",
+                                                                                  "fieldValue":  "={{ $json.tipo }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "status_resposta",
+                                                                                  "fieldValue":  "AGUARDANDO_RESPOSTA"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "email",
+                                                                                  "fieldValue":  "\u003cCAIXA_DE_EMAIL_MONITORADA\u003e"
+                                                                              }
+                                                                          ]
+                                                      }
+                                     },
+                      "type":  "n8n-nodes-base.supabase",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1248,
+                                       -720
+                                   ],
+                      "name":  "Create a row"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "ab91f2b2-b83e-4eac-8f1b-874dd7d162ee",
+                                                                                   "leftValue":  "={{ $json.ehCandidatoOrcamento }}",
+                                                                                   "rightValue":  "",
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       272,
+                                       -400
+                                   ],
+                      "name":  "If"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "770d4678-4835-4056-966b-74038648d580",
+                                                                                   "leftValue":  "={{ $json.tipo }}",
+                                                                                   "rightValue":  "NOVO_ORCAMENTO",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals",
+                                                                                                    "name":  "filter.operator.equals"
+                                                                                                }
+                                                                               },
+                                                                               {
+                                                                                   "id":  "be316629-1c9e-4a64-8b0d-b6f228648e39",
+                                                                                   "leftValue":  "={{ $json.e_novo_orcamento }}",
+                                                                                   "rightValue":  "",
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "operation":  "true",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       960,
+                                       -544
+                                   ],
+                      "name":  "If1"
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=Remetente: {{ $(\u0027Get Message Content\u0027).item.json.from.value[0].name }}\nE-mail remetente: {{ $(\u0027Get Message Content\u0027).item.json.from.value[0].address }}\nAssunto: {{ $json.subjectBase || $(\u0027Get Message Content\u0027).item.json.subject }}\nData: {{ $(\u0027Get Message Content\u0027).item.json.date }}\n\nCorpo:\n{{ $json.bodyLimpo }}",
+                                         "messages":  {
+                                                          "messageValues":  [
+                                                                                {
+                                                                                    "message":  "Considere APENAS a mensagem mais recente enviada pelo remetente nesta interação.\nIgnore completamente histórico citado, respostas antigas, encaminhamentos, assinaturas anteriores e qualquer conteúdo abaixo de marcadores como \"Em ... escreveu:\", \"On ... wrote:\", \"De:\", \"From:\", \"Sent:\", \"Original Message\".\n\nVocê é um classificador de e-mails de uma empresa de comunicação visual.\n\nTarefa: analisar o conteúdo do e-mail e responder APENAS o JSON pedido.\n\nVocê deve:\n- Classificar se é um PEDIDO DE NOVO ORÇAMENTO de serviços/projetos de comunicação visual.\n- Extrair os campos solicitados.\n- Gerar um resumo que contenha TODAS as especificações técnicas mencionadas, sem omitir nada relevante.\n\nCategorias de classificação:\n- NOVO_ORCAMENTO: cliente pedindo orçamento de um novo job/projeto.\n- REVISAO_ORCAMENTO: mudança/revisão em orçamento já enviado.\n- DUVIDA: dúvidas sobre orçamento já enviado.\n- OUTRO: qualquer outro assunto.\n\nREGRAS PARA DIFERENCIAR PEDIDO DE ORÇAMENTO DE OUTRAS MENSAGENS:\n\nPara classificar como \"NOVO_ORCAMENTO\", o e-mail deve obrigatoriamente conter:\n- Uma intenção explícita de solicitação, como:\n  \"solicito orçamento\", \"favor orçar\", \"preciso de orçamento\",\n  \"pedimos orçamento\", \"poderia enviar orçamento\", \"cotação solicitada\",\n  \"orçamento para\", \"cotação para\", \"solicitação de orçamento\".\n  \nE NÃO deve ser classificado como NOVO_ORCAMENTO se ocorrer qualquer uma das situações abaixo:\n- O e-mail é apenas um *aviso*, *alerta*, *confirmação*, *status*, *prorrogação*, *encerramento*, *notificação*, *resultado* ou *comunicação administrativa*.\n- O e-mail fala sobre “encerramento de cotação”, “status da cotação”, “resultado da cotação”, “término da cotação”, “alerta sobre cotação”, etc.\n- O e-mail descreve um escopo, edital, termo de referência, especificações de projeto ou materiais sem solicitar orçamento.\n- O e-mail relata informações técnicas, anexos ou documentos, mas NÃO contém um pedido explícito de preço.\n- O remetente é “no-reply”, “sistema”, “automático”, ou e-mails que claramente não pertencem a clientes finais.\n- O texto descreve uma cotação já existente, independente de termos técnicos presentes.\n\nSe nenhuma frase do e-mail indicar claramente que o remetente está PEDINDO um orçamento, classifique como OUTRO.\n\nRegras para o campo \"resumo\":\n- Deve ser um texto estruturado em múltiplas linhas, pronto para uso no WhatsApp.\n- Organize o conteúdo em blocos com títulos em maiúsculas e bulletpoints, por exemplo:\n\n*ITENS SOLICITADOS*\n• \u003citem 1 – quantidade – medidas/formato – material – acabamento – informações de impressão – outras especificações relevantes\u003e\n• \u003citem 2 – ...\u003e\n\n*ESPECIFICAÇÕES GERAIS*\n• \u003ccaracterísticas técnicas gerais que se aplicam ao pedido como um todo\u003e\n\n*INSTALAÇÃO / APLICAÇÃO*\n• \u003cinformações sobre instalação/aplicação, quando houver\u003e\n\n*PRAZOS*\n• \u003cprazos de produção, datas de entrega ou instalação\u003e\n\n*ENTREGA / ENDEREÇOS*\n• \u003clocais de entrega, cidade/UF, divisão por unidade quando houver\u003e\n\n*OBSERVAÇÕES IMPORTANTES*\n• \u003cqualquer instrução adicional relevante, como orçar frete, envio de mostruário, restrições, etc.\u003e\n\n- Você pode omitir um bloco se não houver nenhuma informação correspondente no e-mail.\n- NÃO pode omitir nenhuma informação técnica relevante do pedido:\n  - quantidade(s)\n  - tipo de material\n  - acabamentos (ex.: laminação, corte arredondado, verniz etc.)\n  - formato/medidas (ex.: A4, 30x40cm etc.)\n  - informações de cor/impressão (ex.: códigos numéricos ou abreviações como \"4/0\", \"1x0\" etc.)\n  - prazo ou data/horário de entrega, se houver\n- Não traduza nem interprete códigos técnicos (por exemplo, códigos de impressão com números e barras); apenas copie-os exatamente como aparecem.\n- Não invente informações que não estejam explícitas no texto.\n- Se alguma informação não existir no e-mail, simplesmente não a mencione no resumo.\n\nExtrações obrigatórias:\n- \"nome_contato\": nome da pessoa (do cabeçalho ou da assinatura; se não for possível, use null).\n- \"empresa\": se possível, nome da empresa com base em:\n    1) domínio do e-mail, ou\n    2) assinatura do e-mail. Se não achar, use null.\n- \"data_recebido\": data no formato \"YYYY-MM-DD\" em fuso de Brasília, derivada da data do e-mail.\n- \"hora_recebido\": horário no formato \"HH:mm\" em fuso de Brasília, derivada da data do e-mail.\n\nRegra obrigatória para extração de \"empresa\":\n- Sempre retornar APENAS o nome da empresa, sem domínio e sem sufixos (.com, .com.br, etc.).\n- Exemplo: \"\u003cEMAIL_REMETENTE_SANITIZADO\u003e\" -\u003e \"Empresa Exemplo\"\n- Exemplo: \"\u003cEMAIL_REMETENTE_SANITIZADO\u003e\" -\u003e \"Marca Exemplo\"\n- Nunca retornar o domínio completo.\n- Caso não seja possível identificar a empresa, use null.\n\nResponda SEMPRE e SOMENTE em JSON, exatamente neste formato:\n\n{\n  \"tipo\": \"NOVO_ORCAMENTO\" | \"REVISAO_ORCAMENTO\" | \"DUVIDA\" | \"OUTRO\",\n  \"e_novo_orcamento\": true | false,\n  \"nome_contato\": \"\u003cstring ou null\u003e\",\n  \"empresa\": \"\u003cstring ou null\u003e\",\n  \"data_recebido\": \"\u003cYYYY-MM-DD\u003e\",\n  \"hora_recebido\": \"\u003cHH:mm\u003e\",\n  \"resumo\": \"\u003cstring\u003e\"\n}"
+                                                                                }
+                                                                            ]
+                                                      },
+                                         "batching":  {
+
+                                                      }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.chainLlm",
+                      "typeVersion":  1.9,
+                      "position":  [
+                                       592,
+                                       -544
+                                   ],
+                      "name":  "Basic LLM Chain"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+                                                         "maxTokens":  4096,
+                                                         "responseFormat":  "json_object",
+                                                         "temperature":  0.1
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+                      "typeVersion":  1,
+                      "position":  [
+                                       592,
+                                       -336
+                                   ],
+                      "name":  "DeepSeek Chat Model"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "ba6e7a1c-3b83-404c-8f6b-819d87bc2474",
+                                                                                     "name":  "mensagem_whatsapp",
+                                                                                     "value":  "={{ [\n\u0027📧 *Novo pedido de orçamento recebido em \u003cCAIXA_MONITORADA\u003e*\u0027,\n\u0027\u0027,\n`👤 Contato: ${$(\u0027Basic LLM Chain\u0027).item.json.nome_contato ?? \u0027-\u0027}`,\n`🏢 Empresa: ${$(\u0027Basic LLM Chain\u0027).item.json.empresa ?? \u0027-\u0027}`,\n`⏰ Recebido: ${$(\u0027Basic LLM Chain\u0027).item.json.data_recebido ? DateTime.fromISO($(\u0027Basic LLM Chain\u0027).item.json.data_recebido).toFormat(\u0027dd/MM/yyyy\u0027) : \u0027-\u0027} às ${$(\u0027Basic LLM Chain\u0027).item.json.hora_recebido ?? \u0027-\u0027}`,\n`📩 Assunto: ${$(\u0027Get Message Content\u0027).item.json.subject ?? \u0027-\u0027}`,\n\u0027\u0027,\nString($(\u0027Basic LLM Chain\u0027).item.json.resumo ?? \u0027\u0027).replace(/^\\s+/, \u0027\u0027)\n].join(\u0027\\n\u0027) }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       1632,
+                                       -720
+                                   ],
+                      "name":  "Estruturar mensagem"
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "jsCode":  "const msg = $(\u0027Get Message Content\u0027).item.json;\n\nfunction htmlToText(html) {\n  return String(html || \u0027\u0027)\n    .replace(/\u003cstyle[\\s\\S]*?\u003c\\/style\u003e/gi, \u0027 \u0027)\n    .replace(/\u003cscript[\\s\\S]*?\u003c\\/script\u003e/gi, \u0027 \u0027)\n    .replace(/\u003cbr\\s*\\/?\u003e/gi, \u0027\\n\u0027)\n    .replace(/\u003c\\/p\u003e/gi, \u0027\\n\u0027)\n    .replace(/\u003c\\/div\u003e/gi, \u0027\\n\u0027)\n    .replace(/\u003c[^\u003e]+\u003e/g, \u0027 \u0027)\n    .replace(/\u0026nbsp;/gi, \u0027 \u0027)\n    .replace(/\u0026amp;/gi, \u0027\u0026\u0027)\n    .replace(/\u0026lt;/gi, \u0027\u003c\u0027)\n    .replace(/\u0026gt;/gi, \u0027\u003e\u0027)\n    .replace(/\\r/g, \u0027\u0027)\n    .replace(/[ \\t]+\\n/g, \u0027\\n\u0027)\n    .replace(/\\n{3,}/g, \u0027\\n\\n\u0027)\n    .replace(/[ \\t]{2,}/g, \u0027 \u0027)\n    .trim();\n}\n\nfunction extractLatestMessage(text) {\n  const patterns = [\n    /(?:^|\\n)\\s*-{2,}\\s*Mensagem encaminhada\\s*-{2,}/i,\n    /(?:^|\\n)\\s*-{2,}\\s*Forwarded message\\s*-{2,}/i,\n    /(?:^|\\n)\\s*-{2,}\\s*Original Message\\s*-{2,}/i,\n    /(?:^|\\n)\\s*Em\\s+.+?escreveu:/i,\n    /(?:^|\\n)\\s*On\\s+.+?wrote:/i,\n    /(?:^|\\n)\\s*De:\\s.+/i,\n    /(?:^|\\n)\\s*From:\\s.+/i,\n    /(?:^|\\n)\\s*Enviado:\\s.+/i,\n    /(?:^|\\n)\\s*Sent:\\s.+/i,\n  ];\n\n  let cutIndex = text.length;\n\n  for (const re of patterns) {\n    const m = re.exec(text);\n    if (m \u0026\u0026 typeof m.index === \u0027number\u0027 \u0026\u0026 m.index \u003c cutIndex) {\n      cutIndex = m.index;\n    }\n  }\n\n  return text.slice(0, cutIndex).trim();\n}\n\nconst rawSubject = String(msg.subject || \u0027\u0027).trim();\nconst subjectBase = rawSubject.replace(/^\\s*((re|res|aw|fwd|fw)\\s*:\\s*)+/gi, \u0027\u0027).trim();\nconst isReplyOrForward = rawSubject !== subjectBase;\n\nconst rawBody =\n  String(msg.text || \u0027\u0027).trim() ||\n  htmlToText(msg.html || msg.textAsHtml || \u0027\u0027);\n\nconst bodyLimpo = extractLatestMessage(rawBody);\n\nconst subjectRegex = /(orçamento|orcamento|cotação|cotacao)/i;\nconst bodyRegex = /(orçamento|orcamento|cotação|cotacao|pedido de orçamento|solicito orçamento|favor orçar|preciso de orçamento|cotação para|orcamento para|poderia enviar orçamento)/i;\n\nconst subjectMatch = subjectRegex.test(subjectBase);\nconst bodyMatch = bodyRegex.test(bodyLimpo);\n\nconst ehCandidatoOrcamento = !isReplyOrForward \u0026\u0026 (subjectMatch || bodyMatch);\n\nreturn {\n  json: {\n    ehCandidatoOrcamento,\n    subjectMatch,\n    bodyMatch,\n    isReplyOrForward,\n    subjectBase,\n    bodyLimpo,\n  },\n};"
+                                     },
+                      "name":  "Pré-Filtro",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       16,
+                                       -400
+                                   ]
+                  }
+              ],
+    "connections":  {
+                        "Gmail Trigger":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Get Message Content",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Get Message Content":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Pré-Filtro",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Create a row":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Adicionar label orc_processado",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "If":  {
+                                   "main":  [
+                                                [
+                                                    {
+                                                        "node":  "Basic LLM Chain",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    }
+                                                ]
+                                            ]
+                               },
+                        "If1":  {
+                                    "main":  [
+                                                 [
+                                                     {
+                                                         "node":  "Create a row",
+                                                         "type":  "main",
+                                                         "index":  0
+                                                     }
+                                                 ]
+                                             ]
+                                },
+                        "DeepSeek Chat Model":  {
+                                                    "ai_languageModel":  [
+                                                                             [
+                                                                                 {
+                                                                                     "node":  "Basic LLM Chain",
+                                                                                     "type":  "ai_languageModel",
+                                                                                     "index":  0
+                                                                                 }
+                                                                             ]
+                                                                         ]
+                                                },
+                        "Basic LLM Chain":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "If1",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Estruturar mensagem":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Whapi - Alertar Grupo",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Pré-Filtro":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "If",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "Adicionar label orc_processado":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Estruturar mensagem",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           }
+                    },
+    "active":  false,
+    "settings":  {
+                     "executionOrder":  "v1"
+                 }
+}

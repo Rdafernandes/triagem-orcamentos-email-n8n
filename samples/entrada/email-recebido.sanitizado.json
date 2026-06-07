@@ -1,0 +1,43 @@
+{
+  "id": "<GMAIL_MESSAGE_ID>",
+  "threadId": "<GMAIL_THREAD_ID>",
+  "labelIds": [
+    "INBOX",
+    "UNREAD"
+  ],
+  "sizeEstimate": 12345,
+  "headers": {
+    "from": "Contato Exemplo <EMAIL_REMETENTE_SANITIZADO>",
+    "to": "<EMAIL_COMERCIAL_SANITIZADO>",
+    "subject": "Solicitacao de orcamento - materiais de comunicacao visual",
+    "date": "Thu, 05 Jun 2026 14:32:10 -0300"
+  },
+  "html": "<p>Ola, gostaria de solicitar um orcamento...</p>",
+  "text": "Ola, gostaria de solicitar um orcamento para materiais de comunicacao visual.\n\nItem 1: 20 placas em PVC 2mm, tamanho 30x40 cm, impressao 4/0.\nItem 2: 2 banners em lona, tamanho 80x120 cm, com acabamento em bastao.\n\nEntrega em Sao Paulo/SP ate 12/06.",
+  "textAsHtml": "<p>Ola, gostaria de solicitar um orcamento para materiais de comunicacao visual.</p>",
+  "subject": "Solicitacao de orcamento - materiais de comunicacao visual",
+  "references": "<REFERENCES_HEADER>",
+  "date": "2026-06-05T17:32:10.000Z",
+  "to": {
+    "value": [
+      {
+        "address": "<EMAIL_COMERCIAL_SANITIZADO>",
+        "name": "Comercial"
+      }
+    ],
+    "html": "<span>Comercial &lt;EMAIL_COMERCIAL_SANITIZADO&gt;</span>",
+    "text": "Comercial <EMAIL_COMERCIAL_SANITIZADO>"
+  },
+  "from": {
+    "value": [
+      {
+        "address": "<EMAIL_REMETENTE_SANITIZADO>",
+        "name": "Contato Exemplo"
+      }
+    ],
+    "html": "<span>Contato Exemplo &lt;EMAIL_REMETENTE_SANITIZADO&gt;</span>",
+    "text": "Contato Exemplo <EMAIL_REMETENTE_SANITIZADO>"
+  },
+  "messageId": "<MESSAGE_ID_HEADER>",
+  "inReplyTo": "<IN_REPLY_TO_HEADER>"
+}
