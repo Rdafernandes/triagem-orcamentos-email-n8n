@@ -49,7 +49,7 @@ O workflow combina regras determinísticas e classificação semântica:
 
 Durante o desenvolvimento foram adotadas decisões para reduzir processamento desnecessário e aumentar previsibilidade do fluxo.
 
-### Pré-processamento antes da LLM
+### Pré-processamento antes do LLM
 
 O workflow executa limpeza do conteúdo do e-mail antes da inferência:
 
@@ -152,7 +152,16 @@ Apenas a versão sanitizada do workflow deve ser publicada. Exports originais, o
 
 ## Evolução
 
-O fluxo documentado já representa uma automação ativa em produção. O roadmap em [docs/06-roadmap-evolucao.md](docs/06-roadmap-evolucao.md) registra melhorias planejadas para ampliar robustez, observabilidade e capacidade de processamento, sem tratar essas melhorias como requisitos para funcionamento atual.
+O fluxo documentado representa uma automação ativa em produção.
+
+As evoluções planejadas estão registradas em [docs/06-roadmap-evolucao.md](docs/06-roadmap-evolucao.md) e seguem princípios já utilizados na solução atual:
+
+- aumento de observabilidade
+- melhoria na capacidade de processamento
+- redução de falsos positivos
+- expansão controlada das regras de classificação
+
+As melhorias listadas representam evolução incremental e não requisitos para funcionamento da automação.
 
 ## Estado do Projeto
 
