@@ -49,7 +49,7 @@ O workflow combina regras determinísticas e classificação semântica:
 
 Durante o desenvolvimento foram adotadas decisões para reduzir processamento desnecessário e aumentar previsibilidade do fluxo.
 
-### Pré-processamento antes do LLM
+### Pré-processamento antes da LLM
 
 O workflow executa limpeza do conteúdo do e-mail antes da inferência:
 
