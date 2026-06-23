@@ -6,9 +6,24 @@ O projeto documenta a arquitetura, o fluxo de dados, as integrações e o proces
 
 ## Resumo Executivo
 
-A automação monitora uma caixa comercial, identifica mensagens candidatas a novo pedido de orçamento, limpa o conteúdo do e-mail, classifica a solicitação com apoio de LLM, registra os dados em uma base operacional e envia um alerta para acompanhamento comercial.
+A automação monitora uma caixa comercial, identifica mensagens candidatas a novo pedido de orçamento, limpa o conteúdo do e-mail, classifica, extrai e estrutura os dados com apoio de LLM, registra os dados em uma base operacional e envia um alerta para acompanhamento comercial.
 
 O foco do repositório não é apenas armazenar um workflow exportado. A proposta é mostrar como uma solução real foi organizada para leitura pública: com documentação técnica, workflow sanitizado, amostras fictícias baseadas na estrutura real dos outputs e evidências visuais do fluxo.
+
+## Competências demonstradas
+
+Este projeto demonstra experiência prática em:
+
+- Automação orientada a eventos
+- Processamento e normalização de dados não estruturados
+- Aplicação de LLM em cenário operacional real
+- Engenharia de prompts para classificação e extração estruturada
+- Redução de custo computacional com pré-processamento determinístico
+- Transformação de texto livre em payload estruturado
+- Persistência e rastreabilidade operacional
+- Integração entre serviços utilizando APIs e webhooks
+- Desenvolvimento de lógica aplicada utilizando JavaScript
+- Conversão de processos comerciais em soluções automatizadas
 
 ## Problema Resolvido
 
@@ -30,6 +45,39 @@ O workflow combina regras determinísticas e classificação semântica:
 8. O Gmail aplica uma label de processamento.
 9. Uma mensagem operacional é montada e enviada via gateway de WhatsApp.
 
+## Decisões técnicas relevantes
+
+Durante o desenvolvimento foram adotadas decisões para reduzir processamento desnecessário e aumentar previsibilidade do fluxo.
+
+### Pré-processamento antes do LLM
+
+O workflow executa limpeza do conteúdo do e-mail antes da inferência:
+
+- remoção de HTML
+- remoção de histórico de threads
+- remoção de encaminhamentos
+- normalização do assunto
+
+Após o pré-processamento, regras determinísticas validam se o e-mail possui características mínimas de um pedido de orçamento.
+
+Somente mensagens candidatas seguem para classificação com LLM.
+
+### Classificação estruturada
+
+O modelo não retorna texto livre.
+
+A saída é convertida para JSON estruturado contendo:
+
+- classificação do e-mail
+- identificação do contato
+- empresa
+- data e horário normalizados
+- resumo operacional
+
+### Persistência e rastreabilidade
+
+Somente pedidos classificados como novos orçamentos são registrados e distribuídos operacionalmente.
+
 ## Captura do Workflow
 
 ![Workflow completo no n8n](assets/screenshots/workflow-completo.png)
@@ -38,12 +86,25 @@ A captura mostra somente a topologia do workflow no canvas do n8n. Painéis de c
 
 ## Stack
 
-- n8n
-- Gmail
-- JavaScript em Code node
-- DeepSeek Chat Model
-- Supabase
-- HTTP Request para gateway de WhatsApp
+- **n8n** — orquestração e execução do workflow
+- **Gmail** — captura e gerenciamento das mensagens
+- **JavaScript** — pré-processamento textual e regras operacionais
+- **DeepSeek (LLM)** — classificação semântica e extração estruturada
+- **Supabase** — persistência operacional
+- **HTTP APIs** — distribuição e comunicação entre serviços
+- **WhatsApp Gateway (Whapi)** — envio operacional dos alertas
+
+## Fluxo macro
+
+1. Monitoramento da caixa comercial
+2. Recuperação do conteúdo completo do e-mail
+3. Limpeza e normalização textual
+4. Pré-filtragem determinística
+5. Classificação e extração com LLM
+6. Validação do resultado
+7. Registro operacional
+8. Marcação do e-mail
+9. Distribuição do alerta
 
 ## Estrutura do Repositório
 
