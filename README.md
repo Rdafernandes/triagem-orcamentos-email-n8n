@@ -39,7 +39,7 @@ O workflow combina regras determinísticas e classificação semântica:
 2. O conteúdo completo do e-mail é recuperado.
 3. Um Code node limpa HTML/texto, remove histórico de threads e aplica um pré-filtro.
 4. Um IF evita acionar o LLM quando a mensagem não parece candidata.
-5. O LLM classifica o e-mail e retorna um JSON estruturado.
+5. O LLM classifica, extrai informações operacionais e retorna um JSON estruturado.
 6. Um segundo IF confirma se o resultado é `NOVO_ORCAMENTO`.
 7. O Supabase registra os dados estruturados.
 8. O Gmail aplica uma label de processamento.
@@ -91,7 +91,7 @@ A captura mostra somente a topologia do workflow no canvas do n8n. Painéis de c
 - **JavaScript** — pré-processamento textual e regras operacionais
 - **DeepSeek (LLM)** — classificação semântica e extração estruturada
 - **Supabase** — persistência operacional
-- **HTTP APIs** — distribuição e comunicação entre serviços
+- **HTTP Requests** — integração e comunicação entre serviços
 - **WhatsApp Gateway (Whapi)** — envio operacional dos alertas
 
 ## Fluxo macro
